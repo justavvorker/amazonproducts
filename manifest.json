@@ -1,0 +1,17 @@
+{
+  "name": "Amazon Products",
+  "short_name": "Amazon Products",
+  "description": "Premium Amazon Product Picks",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#131921",
+  "theme_color": "#131921",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

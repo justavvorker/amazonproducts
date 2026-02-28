@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Amazon Products</title>
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+#theme-toggle {
+    position: relative;
+    padding: 10px 20px;
+    border-radius: 30px;
+    border: none;
+    cursor: pointer;
+    font-weight: 800;
+    font-size: 12px;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    background: #f3a847; /* Gьndьz turuncusu */
+    color: #111;
+    box-shadow: 0 4px 15px rgba(243, 168, 71, 0.4);
+    overflow: hidden;
+}
+
+/* Gece Modunda Butonun Degisimi */
+body.night #theme-toggle {
+    background: #37475a; /* Gece mavisi */
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6), inset 0 0 10px rgba(255,255,255,0.1);
+}
+
+/* Butonun Iзindeki Ikon Animasyonu */
+#theme-toggle i {
+    font-size: 16px;
+    transition: transform 0.6s rotate;
+}
+
+body.night #theme-toggle i {
+    transform: rotate(360deg) scale(1.2);
+    color: #f1c40f; /* Ay rengi */
+}
+
+/* Butonun Ьzerine Gelince Parlama */
+#theme-toggle:hover {
+    transform: scale(1.1);
+    letter-spacing: 2px;
+}
+
+/* Sayfa Geзis Efekti (Tьm siteyi kapsar) */
+body {
+    transition: background-color 0.8s cubic-bezier(0.4, 0, 0.2, 1), 
+                color 0.5s ease;
+}
+
+/* Arka planda uзusan kьзьk bir detay (Opsiyonel) */
+body.night::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: radial-gradient(circle at 70% 20%, rgba(255,255,255,0.05) 0%, transparent 20%);
+    pointer-events: none;
+    z-index: -1;
+}.card {
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    cursor: pointer;
+    animation: fadeIn 0.6s ease backwards;
+}
+
+.card:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 15px 30px rgba(243, 168, 71, 0.3); /* Turuncu hafif parlama */
+    border: 1px solid var(--orange);
+}
+
+/* 2. Satin Al Butonu Parlama Animasyonu */
+.btn {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    z-index: 1;
+}
+
+.btn:active {
+    transform: scale(0.95);
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    transition: 0.5s;
+    z-index: -1;
+}
+
+.btn:hover::before {
+    left: 100%; /* Mouse gelince iзinden isik geзer */
+}
+
+/* 3. Favori Kalbi Ziplama Efekti */
+.wishlist-icon {
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.wishlist-icon:hover {
+    transform: scale(1.3);
+}
+
+.wishlist-icon.fa-solid {
+    animation: heartBeat 0.4s linear;
+}
+
+@keyframes heartBeat {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.5); }
+    100% { transform: scale(1.2); }
+}
+
+/* 4. Sayfa Yьklenirken Ьrьnlerin Sirayla Gelmesi */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* 5. Gece Modu Geзis Yumusakligi */
+body {
+    transition: background 0.5s ease, color 0.5s ease;
+}
+
+/* 6. Logo Gцkkusagi Akis Animasyonu */
+.logo span {
+    background: linear-gradient(90deg, #ff8c00, #ffee00, #ff8c00);
+    background-size: 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: logoFlow 3s linear infinite;
+}
+
+@keyframes logoFlow {
+    from { background-position: 0%; }
+    to { background-position: 200%; }
+}
+
+/* 7. Kategori Butonlari Alt Зizgi Efekti */
+.cat-btn {
+    position: relative;
+    transition: 0.3s;
+}
+
+.cat-btn::after {
+    content: '';
+    position: absolute;
+    bottom: 5px; left: 10%;
+    width: 0; height: 2px;
+    background: var(--orange);
+    transition: 0.3s;
+}
+
+.cat-btn:hover::after {
+    width: 80%;
+}::-webkit-scrollbar {
+    width: 12px; /* Зubugun genisligi */
+    background: var(--navy); /* Arka plan rengi */
+}
+
+/* 2. Kaydirici (Thumb) - Hareket Eden Kisim */
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, var(--orange), #ff4500, var(--orange));
+    background-size: 200% 200%;
+    border-radius: 20px;
+    border: 3px solid var(--navy); /* Kenarlarda bosluk hissi yaratir */
+    box-shadow: 0 0 10px var(--orange); /* Neon parlama efekti */
+    transition: 0.5s;
+    animation: scrollGradient 3s ease infinite; /* Sьrekli renk akisi */
+}
+
+/* 3. Mouse Ьzerine Gelince (Hover) */
+::-webkit-scrollbar-thumb:hover {
+    background: #fff; /* Ьstьne gelince beyaza parlar */
+    box-shadow: 0 0 20px #fff;
+    border: 1px solid var(--orange);
+}
+
+/* 4. Renk Akis Animasyonu */
+@keyframes scrollGradient {
+    0% { background-position: 0% 0%; }
+    50% { background-position: 0% 100%; }
+    100% { background-position: 0% 0%; }
+}
+
+/* 5. Firefox Iзin (Alternatif Destek) */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--orange) var(--navy);
+}
+:root{
+    --navy:#131921; --light-navy:#232f3e; --orange:#f3a847;
+    --bg:#eaeded; --text:#111; --card-bg:#fff; --btn-bg:#ffa41c;
+}
+body.night{
+    --navy:#0b111a; --light-navy:#1a2233; --orange:#ff9900;
+    --bg:#0f1620; --text:#eee; --card-bg:#1c2433;
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,Arial}
+body{background:var(--bg);color:var(--text);transition:0.4s; overflow-x:hidden;}
+
+/* --- HEADER --- */
+header {
+    background: var(--navy);
+    padding: 10px 15px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Elemanlari yayar */
+    gap: 10px;
+}
+
+/* --- ANIMASYONLU MENU --- */
+.menu-toggle {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 25px;
+    height: 18px;
+    cursor: pointer;
+    z-index: 1001;
+}
+.menu-toggle span {
+    display: block;
+    height: 3px;
+    width: 100%;
+    background-color: #fff;
+    border-radius: 3px;
+    transition: 0.3s ease-in-out;
+}
+.menu-toggle.active span:nth-child(1) { transform: translateY(7.5px) rotate(45deg); }
+.menu-toggle.active span:nth-child(2) { opacity: 0; transform: translateX(-10px); }
+.menu-toggle.active span:nth-child(3) { transform: translateY(-7.5px) rotate(-45deg); }
+
+.logo{
+    font-size:20px; font-weight:900; color:#fff; text-decoration:none;
+}
+.logo span{ color: var(--orange); }
+
+.search-container { position: relative; display: flex; align-items: center; flex-grow: 1; max-width: 300px; }
+.search-input {
+    width: 100%; padding: 8px 10px 8px 35px; border-radius: 20px; 
+    border: none; background: var(--light-navy); color: #fff; outline: none;
+}
+.search-icon { position: absolute; left: 10px; color: #888; }
+
+#theme-toggle { 
+    background: var(--orange); border: none; padding: 6px 12px; 
+    border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 11px;
+}
+
+/* --- GRID & CARDS --- */
+.container{ padding: 10px; margin-top: 10px; }
+.grid{ display:grid; grid-template-columns:repeat(2, 1fr); gap:10px; }
+@media (min-width: 768px) {
+    .grid { grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
+}
+
+.card{ background:var(--card-bg); border-radius:12px; padding:15px; display:flex; flex-direction:column; position:relative; transition:.3s; }
+.img-box{ height:120px; display:flex; align-items:center; justify-content:center; }
+.img-box img{ max-width:100%; max-height:100%; object-fit:contain; }
+.title{ color:#007185; margin:10px 0; font-weight:600; font-size: 12px; height: 32px; overflow: hidden; }
+.price{ font-size:18px; font-weight:700; margin-bottom:10px; }
+.btn{ background:var(--btn-bg); color:#111; padding:10px; border-radius:20px; text-align:center; text-decoration:none; font-weight:700; font-size: 11px; }
+
+.wishlist-icon { position: absolute; top: 10px; right: 10px; font-size: 18px; color: #888; cursor: pointer; }
+
+/* --- NAV --- */
+.category-nav{
+    position:fixed; left:-260px; top:0; width:240px; height:100vh;
+    background:var(--light-navy); padding:80px 20px; display:flex;
+    flex-direction:column; gap:14px; transition:.35s; z-index:999;
+}
+.category-nav.open{left:0}
+.cat-btn{ display:flex; align-items:center; gap:10px; color:#fff; cursor:pointer; padding: 10px; border-radius: 8px; }
+.cat-btn.active { background: #fff; color: #111; }
+
+.floating-fav-btn {
+    position: fixed; bottom: 20px; right: 20px; background-color: var(--orange);
+    color: #fff; width: 55px; height: 55px; border-radius: 50%;
+    display: flex; justify-content: center; align-items: center; z-index: 1002;
+}
+.fav-count { position: absolute; top: -5px; right: -5px; background: red; font-size: 11px; width: 20px; height: 20px; border-radius: 50%; display: flex; justify-content: center; align-items: center; }
+
+</style>
+</head>
+<body>
+
+<header>
+    <div class="menu-toggle" onclick="toggleMenu()">
+        <span></span><span></span><span></span>
+    </div>
+    
+    <div class="search-container">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <input type="text" placeholder="Search..." class="search-input">
+    </div>
+
+    <a class="logo" href="#">amazon<span>.picks</span></a>
+    
+    <button id="theme-toggle">NIGHT</button>
+</header>
+
+<div class="category-nav">
+    <div class="cat-btn active" onclick="filterProducts('all',this)">All Products</div>
+    <div class="cat-btn" onclick="filterProducts('gaming',this)">Gaming</div>
+    <div class="cat-btn" onclick="filterProducts('perfume',this)">Perfume</div>
+    <div class="cat-btn" onclick="filterProducts('smartwatch',this)">Smart Watch</div>
+</div>
+
+<div class="container">
+    <div class="grid" id="list"></div>
+</div>
+
+<a href="#" class="floating-fav-btn" onclick="showFavorites(event)">
+    <i class="fa-solid fa-heart"></i>
+    <span class="fav-count">0</span>
+</a>
+
+<script>
+// Favorileri gцsteren ana fonksiyon
+function showFavorites(event) {
+    if(event) event.preventDefault(); // Sayfa yukari siзramasin
+    
+    const favsNames = getFavorites(); // Kayitli isimleri al
+    const favProducts = products.filter(p => favsNames.includes(p.name)); // Ьrьn listesinden eslestir
+    
+    // Kategorilerdeki 'active' sinifini temizle (зьnkь artik favori listesindeyiz)
+    document.querySelectorAll(".cat-btn").forEach(b => b.classList.remove("active"));
+    
+    if(favProducts.length === 0) {
+        list.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:50px;">
+                            <h2 style="color:var(--orange)">Henьz favori ьrьnьn yok! ??</h2>
+                          </div>`;
+    } else {
+        renderProducts(favProducts); // Sadece favorileri ekrana bas
+    }
+}
+
+// Kalbe basinca hem listeyi gьncellesin hem sayiyi
+function toggleFavorite(icon, name) {
+    let favs = getFavorites();
+    if(favs.includes(name)) {
+        favs = favs.filter(n => n !== name);
+        icon.classList.replace("fa-solid", "fa-regular");
+        icon.style.color = "#888";
+    } else {
+        favs.push(name);
+        icon.classList.replace("fa-regular", "fa-solid");
+        icon.style.color = "#ff4500";
+    }
+    localStorage.setItem("amazon_favorites", JSON.stringify(favs));
+    updateFavCount();
+    
+    // EGER su an favoriler sayfasindaysak, silinen ьrьnь aninda ekrandan kaldir
+    const isActiveFavPage = !document.querySelector(".cat-btn.active");
+    if(isActiveFavPage) {
+        showFavorites(); 
+    }
+}
+const products = [
+  {
+    name: "Logitech G PRO X SUPERLIGHT 2 SE",
+    price: 159.99,
+    cat: "gaming",
+    img: "https://m.media-amazon.com/images/I/61UxfXTUyvL._AC_SL1500_.jpg",
+    link: "https://amzn.to/3OxuY4w"
+  },
+  {
+    name: "Logitech G305 LIGHTSPEED Wireless",
+    price: 59.99,
+    cat: "gaming",
+    img: "https://m.media-amazon.com/images/I/61LtuGzXeaL._AC_SL1500_.jpg",
+    link: "https://amzn.to/4tR718i"
+  },
+  {
+    name: "Logitech G735 Lightspeed RGB Headset",
+    price: 229.00,
+    cat: "gaming",
+    img: "https://m.media-amazon.com/images/I/61S-tVInYGL._AC_SL1500_.jpg",
+    link: "https://amzn.to/4qWDkAd"
+  },
+  {
+    name: "Razer BlackShark V2 X Gaming Headset",
+    price: 49.99,
+    cat: "gaming",
+    img: "https://m.media-amazon.com/images/I/61CGHv6kmWL._AC_SL1500_.jpg",
+    link: "https://amzn.to/46RrIao"
+  },
+  {
+    name: "Retro Handheld Game Console X9",
+    price: 35.99,
+    cat: "gaming",
+    img: "https://m.media-amazon.com/images/I/71Y82A9qOBL._AC_SL1500_.jpg",
+    link: "https://amzn.to/4kQk321"
+  },
+  {
+    name: "RGB Gaming Mouse Pad - Galaxy",
+    price: 19.99,
+    cat: "gaming",
+    img: "https://m.media-amazon.com/images/I/81I-uYl3I4L._AC_SL1500_.jpg",
+    link: "https://amzn.to/4aU72A2"
+  },
+  {
+    name: "Enstixsm Luna Game Controller",
+    price: 42.99,
+    cat: "gaming",
+    img: "https://m.media-amazon.com/images/I/61m1E6l6X0L._AC_SL1500_.jpg",
+    link: "https://amzn.to/4u816fB"
+  },
+  {
+    name: "Razer Orochi V2 Mobile Mouse",
+    price: 49.99,
+    cat: "gaming",
+    img: "https://m.media-amazon.com/images/I/61Q5w1zqk-L._AC_SL1500_.jpg",
+    link: "https://amzn.to/4aAru9S"
+  },
+  {
+    name: "Frigidaire Gaming Mini Refrigerator",
+    price: 45.00,
+    cat: "gaming",
+    img: "https://m.media-amazon.com/images/I/81k70YnU4+L._AC_SL1500_.jpg",
+    link: "https://amzn.to/4bEVhiJ"
+  },
+  {
+    name: "Handmade Crochet Game Controller",
+    price: 15.99,
+    cat: "gaming",
+    img: "https://m.media-amazon.com/images/I/71Lq2n53TGL._AC_SL1500_.jpg",
+    link: "https://amzn.to/4kETgWt"
+  },
+
+  /* ===== PERFUME ===== */
+  {
+    name: "Fragonard Mйlodie Perfume 30ML",
+    price: 49.99,
+    cat: "perfume",
+    img: "https://m.media-amazon.com/images/I/61tM2dQXrWL._AC_SL1500_.jpg",
+    link: "https://amzn.to/4kRlgGm"
+  },
+  {
+    name: "Pheromone Cologne for Men - Citrus",
+    price: 24.99,
+    cat: "perfume",
+    img: "https://m.media-amazon.com/images/I/61pW77I4VFL._AC_SL1500_.jpg",
+    link: "https://amzn.to/4b4X3sE"
+  },
+  {
+    name: "GUESS Seductive Blue Gift Set",
+    price: 35.00,
+    cat: "perfume",
+    img: "https://m.media-amazon.com/images/I/71kLQe2j2EL._AC_SL1500_.jpg",
+    link: "https://amzn.to/4b4TL8I"
+  },
+  {
+    name: "Al-Rehab Choco Musk Rollerball",
+    price: 9.99,
+    cat: "perfume",
+    img: "https://m.media-amazon.com/images/I/61lL7VJ6ZJL._AC_SL1500_.jpg",
+    link: "https://amzn.to/4rynxsx"
+  },
+  {
+    name: "Jayne's Mix Perfume Sampler Set",
+    price: 18.99,
+    cat: "perfume",
+    img: "https://m.media-amazon.com/images/I/61Kq-H6vYOL._AC_SL1500_.jpg",
+    link: "https://amzn.to/3OXog7W"
+  },
+  {
+    name: "DefineMe Natural Perfume 7-Set",
+    price: 28.00,
+    cat: "perfume",
+    img: "https://m.media-amazon.com/images/I/71-0Yp6Y98L._AC_SL1500_.jpg",
+    link: "https://amzn.to/4aGIx9a"
+  },
+  {
+    name: "Marvel Iron Man EDT 3.4oz",
+    price: 15.50,
+    cat: "perfume",
+    img: "https://m.media-amazon.com/images/I/71jA65qXpGL._AC_SL1500_.jpg",
+    link: "https://amzn.to/4qPwJY6"
+  },
+
+  /* ===== SMART WATCH ===== */
+  {
+    name: "Samsung Galaxy Watch 7 (40mm)",
+    price: 299.99,
+    cat: "smartwatch",
+    img: "https://m.media-amazon.com/images/I/61V2cZz6yWL._AC_SL1500_.jpg",
+    link: "https://www.amazon.com/dp/B0D1YQKDML"
+  },
+  {
+    name: "Fitbit Versa 4 Smartwatch",
+    price: 199.95,
+    cat: "smartwatch",
+    img: "https://m.media-amazon.com/images/I/61K8nB3DqOL._AC_SL1500_.jpg",
+    link: "https://www.amazon.com/dp/B0B4MWCFV4"
+  },
+  {
+    name: "Smart Watch - Fitness & Calls",
+    price: 49.99,
+    cat: "smartwatch",
+    img: "https://m.media-amazon.com/images/I/71X8F8P9ZzL._AC_SL1500_.jpg",
+    link: "https://www.amazon.com/dp/B0FSY8FT8C"
+  },
+  {
+    name: "Inspiratek Smartwatch Men/Women",
+    price: 39.99,
+    cat: "smartwatch",
+    img: "https://m.media-amazon.com/images/I/61-A795R1AL._AC_SL1500_.jpg",
+    link: "https://www.amazon.com/dp/B0B9JX7VM4"
+  },
+  {
+    name: "Smartwatch Answer/Make Calls",
+    price: 45.99,
+    cat: "smartwatch",
+    img: "https://m.media-amazon.com/images/I/71ZpS-3O7BL._AC_SL1500_.jpg",
+    link: "https://www.amazon.com/dp/B0DSZRN3YF"
+  },
+
+  
+  
+
+  /* ===== OTHERS & ACCESSORIES ===== */
+  {
+    name: "Mens Walking Shoes Slip On Tennis",
+    price: 39.99,
+    cat: "accessories",
+    img: "https://m.media-amazon.com/images/I/718fXm5hW9L._AC_UY1000_.jpg",
+    link: "https://www.amazon.com/dp/B0F18QZZJD"
+  },
+  {
+    name: "Everlasting Comfort Cloud Foot Rest",
+    price: 34.95,
+    cat: "accessories",
+    img: "https://m.media-amazon.com/images/I/71YyP6K-4NL._AC_SL1500_.jpg",
+    link: "https://amzn.to/4bFDGqX"
+  },
+  {
+    name: "VIENON 4-Port USB 3.0 Hub Splitter",
+    price: 9.99,
+    cat: "accessories",
+    img: "https://m.media-amazon.com/images/I/61S7p6rXmPL._AC_SL1500_.jpg",
+    link: "https://amzn.to/45TMmGt"
+  },
+  {
+    name: "VIENON 4-Port USB Hub (3.3ft Cable)",
+    price: 12.99,
+    cat: "accessories",
+    img: "https://m.media-amazon.com/images/I/61k9B8f0U2L._AC_SL1500_.jpg",
+    link: "https://amzn.to/4kob1ZO"
+  },
+  {
+    name: "LISEN Adjustable Cell Phone Stand",
+    price: 15.99,
+    cat: "accessories",
+    img: "https://m.media-amazon.com/images/I/71vunG12qML._AC_SL1500_.jpg",
+    link: "https://amzn.to/3MfHuVA"
+  },
+  {
+    name: "WOLFBOX MF50 Compressed Air Duster",
+    price: 59.99,
+    cat: "accessories",
+    img: "https://m.media-amazon.com/images/I/71O8-pY7XQL._AC_SL1500_.jpg",
+    link: "https://amzn.to/4a3298w"
+  },
+  {
+    name: "Lamicall Sticky Headphone Stand",
+    price: 11.99,
+    cat: "accessories",
+    img: "https://m.media-amazon.com/images/I/61Y-h7U70SL._AC_SL1500_.jpg",
+    link: "https://amzn.to/4kr2Dcc"
+  }
+];
+
+
+const list = document.getElementById("list");
+
+function getFavorites() { return JSON.parse(localStorage.getItem("amazon_favorites")) || []; }
+
+function updateFavCount() { document.querySelector(".fav-count").innerText = getFavorites().length; }
+
+function toggleFavorite(icon, name) {
+    let favs = getFavorites();
+    if(favs.includes(name)) {
+        favs = favs.filter(n => n !== name);
+        icon.classList.replace("fa-solid", "fa-regular");
+        icon.style.color = "#888";
+    } else {
+        favs.push(name);
+        icon.classList.replace("fa-regular", "fa-solid");
+        icon.style.color = "#ff4500";
+    }
+    localStorage.setItem("amazon_favorites", JSON.stringify(favs));
+    updateFavCount();
+}
+
+function renderProducts(arr) {
+    list.innerHTML = "";
+    const favs = getFavorites();
+    arr.forEach(p => {
+        const isFav = favs.includes(p.name);
+        list.innerHTML += `
+            <div class="card">
+                <div class="img-box"><img src="${p.img}"></div>
+                <i class="${isFav?'fa-solid':'fa-regular'} fa-heart wishlist-icon" 
+                   style="color:${isFav?'#ff4500':'#888'}" 
+                   onclick="toggleFavorite(this,'${p.name}')"></i>
+                <div class="title">${p.name}</div>
+                <div class="price">$${p.price}</div>
+                <a class="btn" href="${p.link}" target="_blank">BUY ON AMAZON</a>
+            </div>`;
+    });
+}
+
+function toggleMenu() {
+    document.querySelector(".category-nav").classList.toggle("open");
+    document.querySelector(".menu-toggle").classList.toggle("active");
+}
+
+function filterProducts(cat, btn) {
+    // 1. Aktif buton gцrselligini gьncelle
+    document.querySelectorAll(".cat-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    
+    // 2. Ьrьnleri filtrele ve ekrana bas
+    const filtered = cat === 'all' ? products : products.filter(p => p.cat === cat);
+    renderProducts(filtered);
+    
+    // 3. MENЬYЬ KAPAT (Hata buradaydi, bu kisim tetiklenmiyordu)
+    const nav = document.querySelector(".category-nav");
+    const menuBtn = document.querySelector(".menu-toggle");
+    
+    if (nav.classList.contains("open")) {
+        nav.classList.remove("open"); // Yan menьyь gizle
+        menuBtn.classList.remove("active"); // Hamburger ikonunu normale dцndьr
+    }
+    
+    // Sayfayi en yukari kaydir (Kullanici yeni ьrьnleri en bastan gцrsьn)
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+const themeBtn = document.getElementById("theme-toggle");
+themeBtn.onclick = () => {
+    document.body.classList.toggle("night");
+    const isNight = document.body.classList.contains("night");
+    themeBtn.innerText = isNight ? "DAY" : "NIGHT";
+    localStorage.setItem("theme", isNight ? "night" : "day");
+};
+
+// Start
+renderProducts(products);
+updateFavCount();
+</script>
+</body>
+</html>
